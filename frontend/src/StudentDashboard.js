@@ -10,7 +10,7 @@ const StudentDashboard = ({ student, onLogout }) => {
 
   useEffect(() => {
     fetchComplaints();
-  }, []);
+  }, [student.id]);
 
   const fetchComplaints = async () => {
     try {
