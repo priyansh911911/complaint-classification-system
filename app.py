@@ -143,45 +143,25 @@ def chatbot_response():
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
         
-        # Try to use Gemini API
-        try:
-            api_key = 'AIzaSyDjTRv3jSaaNy1FHJhcTxs4v_lliqKUAKQ'
-            print(f"Chatbot - API Key present: {bool(api_key)}, Length: {len(api_key) if api_key else 0}")
-            if api_key:
-                genai.configure(api_key=api_key)
-                temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
-                
-                chatbot_prompt = f"""
-                You are a college support assistant. Give ONE focused solution approach.
-                
-                Student message: "{user_message}"
-                
-                Respond with:
-                1. Brief problem acknowledgment (1 sentence)
-                2. ONE specific solution with 2-3 clear steps
-                3. Ask if it worked or if they need alternative steps
-                
-                Keep response under 50 words. Be direct and actionable.
-                """
-                
-                response = temp_model.generate_content(chatbot_prompt)
-                bot_reply = response.text.strip()
-            else:
-                raise Exception("No API key")
-        except Exception as e:
-            # Log the actual error
-            print(f"Gemini API Error: {str(e)}")
-            print(f"Error type: {type(e).__name__}")
-            # Fallback responses
-            user_lower = user_message.lower()
-            if 'wifi' in user_lower or 'internet' in user_lower:
-                bot_reply = "WiFi issues? Try: 1) Disconnect and reconnect 2) Restart your device 3) Move closer to router. Did this help?"
-            elif 'food' in user_lower or 'mess' in user_lower:
-                bot_reply = "Food concerns? 1) Report to mess supervisor 2) Document with photos 3) Submit formal complaint. Need help filing one?"
-            elif 'slow' in user_lower:
-                bot_reply = "Slow connection? 1) Close unnecessary apps 2) Check if many users online 3) Try different location. Better now?"
-            else:
-                bot_reply = "I understand your issue. Try: 1) Restart the device 2) Check if others have same problem 3) Contact support. Would you like to submit a complaint?"
+        api_key = 'AIzaSyDjTRv3jSaaNy1FHJhcTxs4v_lliqKUAKQ'
+        genai.configure(api_key=api_key)
+        temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
+        
+        chatbot_prompt = f"""
+        You are a college support assistant. Give ONE focused solution approach.
+        
+        Student message: "{user_message}"
+        
+        Respond with:
+        1. Brief problem acknowledgment (1 sentence)
+        2. ONE specific solution with 2-3 clear steps
+        3. Ask if it worked or if they need alternative steps
+        
+        Keep response under 50 words. Be direct and actionable.
+        """
+        
+        response = temp_model.generate_content(chatbot_prompt)
+        bot_reply = response.text.strip()
         
         return jsonify({
             "reply": bot_reply,
