@@ -132,11 +132,20 @@ def get_student_complaints(student_id):
 @app.route('/chatbot', methods=['POST'])
 def chatbot_response():
     try:
+        # Check if API key is available
+        api_key = os.environ.get('GEMINI_API_KEY')
+        if not api_key:
+            return jsonify({"error": "API key not configured"}), 500
+            
         data = request.get_json()
         user_message = data.get('message', '')
         
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
+        
+        # Configure Gemini with environment variable
+        genai.configure(api_key=api_key)
+        temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
         
         # Focused troubleshooting prompt
         chatbot_prompt = f"""
@@ -153,7 +162,7 @@ def chatbot_response():
         Keep response under 50 words. Be direct and actionable.
         """
         
-        response = model.generate_content(chatbot_prompt)
+        response = temp_model.generate_content(chatbot_prompt)
         bot_reply = response.text.strip()
         
         # Check if this is a follow-up conversation
@@ -184,6 +193,11 @@ def chatbot_response():
 @app.route('/classify-complaint', methods=['POST'])
 def classify_complaint():
     try:
+        # Check if API key is available
+        api_key = os.environ.get('GEMINI_API_KEY')
+        if not api_key:
+            return jsonify({"error": "API key not configured"}), 500
+            
         data = request.get_json()
         complaint_text = data.get('complaint_text', '')
         student_id = data.get('student_id', '')
@@ -192,6 +206,10 @@ def classify_complaint():
         
         if not complaint_text or not student_id:
             return jsonify({"error": "Missing complaint text or student ID"}), 400
+            
+        # Configure Gemini with environment variable
+        genai.configure(api_key=api_key)
+        temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
         
         # Use student-selected category or AI classification
         if complaint_type:
@@ -207,7 +225,7 @@ def classify_complaint():
             Respond with only the category name, nothing else.
             """
             
-            classification_response = model.generate_content(classification_prompt)
+            classification_response = temp_model.generate_content(classification_prompt)
             category = classification_response.text.strip()
             
             # Validate AI classification
@@ -225,7 +243,7 @@ def classify_complaint():
         Respond with only the sentiment word, nothing else.
         """
         
-        sentiment_response = model.generate_content(sentiment_prompt)
+        sentiment_response = temp_model.generate_content(sentiment_prompt)
         sentiment = sentiment_response.text.strip()
         
         # Validate sentiment
