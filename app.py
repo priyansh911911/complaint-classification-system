@@ -137,55 +137,47 @@ def get_student_complaints(student_id):
 @app.route('/chatbot', methods=['POST'])
 def chatbot_response():
     try:
-        # Check if API key is available
-        api_key = os.environ.get('GEMINI_API_KEY')
-        if not api_key:
-            return jsonify({"error": "API key not configured"}), 500
-            
         data = request.get_json()
         user_message = data.get('message', '')
         
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
         
-        # Configure Gemini with environment variable
-        genai.configure(api_key=api_key)
-        temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
-        
-        # Focused troubleshooting prompt
-        chatbot_prompt = f"""
-        You are a college support assistant. Give ONE focused solution approach.
-        
-        Student message: "{user_message}"
-        
-        Respond with:
-        1. Brief problem acknowledgment (1 sentence)
-        2. ONE specific solution with 2-3 clear steps
-        3. Ask if it worked or if they need alternative steps
-        
-        IMPORTANT: Use generic terms like "college WiFi", "your network", "the WiFi" - never mention specific network names like Eduroam.
-        Keep response under 50 words. Be direct and actionable.
-        """
-        
-        response = temp_model.generate_content(chatbot_prompt)
-        bot_reply = response.text.strip()
-        
-        # Check if this is a follow-up conversation
-        conversation_context = data.get('conversation_history', [])
-        if len(conversation_context) > 2:
-            # Follow-up prompt for alternative solutions
-            followup_prompt = f"""
-            Previous conversation: {conversation_context[-2:]}
-            Student's response: "{user_message}"
-            
-            If previous solution didn't work, give ONE different approach (2-3 steps max).
-            If they've tried 2+ solutions, suggest: "Let's submit a formal complaint for admin help."
-            Use generic terms only - no specific network names.
-            Keep under 40 words.
-            """
-            
-            followup_response = model.generate_content(followup_prompt)
-            bot_reply = followup_response.text.strip()
+        # Try to use Gemini API
+        try:
+            api_key = os.environ.get('GEMINI_API_KEY')
+            if api_key:
+                genai.configure(api_key=api_key)
+                temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
+                
+                chatbot_prompt = f"""
+                You are a college support assistant. Give ONE focused solution approach.
+                
+                Student message: "{user_message}"
+                
+                Respond with:
+                1. Brief problem acknowledgment (1 sentence)
+                2. ONE specific solution with 2-3 clear steps
+                3. Ask if it worked or if they need alternative steps
+                
+                Keep response under 50 words. Be direct and actionable.
+                """
+                
+                response = temp_model.generate_content(chatbot_prompt)
+                bot_reply = response.text.strip()
+            else:
+                raise Exception("No API key")
+        except Exception:
+            # Fallback responses
+            user_lower = user_message.lower()
+            if 'wifi' in user_lower or 'internet' in user_lower:
+                bot_reply = "WiFi issues? Try: 1) Disconnect and reconnect 2) Restart your device 3) Move closer to router. Did this help?"
+            elif 'food' in user_lower or 'mess' in user_lower:
+                bot_reply = "Food concerns? 1) Report to mess supervisor 2) Document with photos 3) Submit formal complaint. Need help filing one?"
+            elif 'slow' in user_lower:
+                bot_reply = "Slow connection? 1) Close unnecessary apps 2) Check if many users online 3) Try different location. Better now?"
+            else:
+                bot_reply = "I understand your issue. Try: 1) Restart the device 2) Check if others have same problem 3) Contact support. Would you like to submit a complaint?"
         
         return jsonify({
             "reply": bot_reply,
