@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ChatBot from './ChatBot';
 import ComplaintForm from './ComplaintForm';
 import config from './config';
@@ -10,9 +10,9 @@ const StudentDashboard = ({ student, onLogout }) => {
 
   useEffect(() => {
     fetchComplaints();
-  }, [student.id]);
+  }, [fetchComplaints]);
 
-  const fetchComplaints = async () => {
+  const fetchComplaints = useCallback(async () => {
     try {
       const response = await fetch(`${config.API_BASE_URL}/student-complaints/${student.id}`);
       const data = await response.json();
@@ -22,7 +22,7 @@ const StudentDashboard = ({ student, onLogout }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [student.id]);
 
   const handleSubmitComplaint = (studentName, chatHistory) => {
     setActiveTab('complaint');
