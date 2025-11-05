@@ -1,25 +1,40 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from http.server import BaseHTTPRequestHandler
+import json
 
-app = Flask(__name__)
-CORS(app)
-
-def handler(req):
-    if req.method != 'POST':
-        return jsonify({"error": "Method not allowed"}), 405
+class handler(BaseHTTPRequestHandler):
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
     
-    try:
-        data = req.get_json()
-        username = data.get('username', '')
-        password = data.get('password', '')
-        
-        if username == 'admin' and password == 'admin123':
-            return jsonify({"success": True, "message": "Login successful"})
-        else:
-            return jsonify({"success": False, "message": "Invalid credentials"}), 401
+    def do_POST(self):
+        try:
+            # Get request data
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
             
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# Export for Vercel
-default = handler
+            username = data.get('username', '')
+            password = data.get('password', '')
+            
+            # Send response
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            if username == 'admin' and password == 'admin123':
+                response = {"success": True, "message": "Login successful"}
+            else:
+                response = {"success": False, "message": "Invalid credentials"}
+            
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+            
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
