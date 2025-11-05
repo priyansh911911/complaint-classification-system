@@ -61,7 +61,7 @@ def init_db():
 init_db()
 
 # Configure Gemini API
-genai.configure(api_key='AIzaSyDjTRv3jSaaNy1FHJhcTxs4v_lliqKUAKQ')
+genai.configure(api_key='AIzaSyAz9f9TvUqIQJ4KOp_Jr-fhxRoJK0asNxo')
 
 # List available models to find the correct one
 print("Available models:")
@@ -143,7 +143,7 @@ def chatbot_response():
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
         
-        api_key = 'AIzaSyDjTRv3jSaaNy1FHJhcTxs4v_lliqKUAKQ'
+        api_key = 'AIzaSyAz9f9TvUqIQJ4KOp_Jr-fhxRoJK0asNxo'
         genai.configure(api_key=api_key)
         temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
         
@@ -175,7 +175,7 @@ def chatbot_response():
 def classify_complaint():
     try:
         # Check if API key is available
-        api_key = 'AIzaSyDjTRv3jSaaNy1FHJhcTxs4v_lliqKUAKQ'
+        api_key = 'AIzaSyAz9f9TvUqIQJ4KOp_Jr-fhxRoJK0asNxo'
             
         data = request.get_json()
         complaint_text = data.get('complaint_text', '')
