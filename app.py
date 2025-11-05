@@ -145,8 +145,8 @@ def chatbot_response():
         
         # Try to use Gemini API
         try:
-            api_key = os.environ.get('GEMINI_API_KEY')
-            print(f"API Key length: {len(api_key) if api_key else 0}")
+            api_key = 'AIzaSyDjTRv3jSaaNy1FHJhcTxs4v_lliqKUAKQ'
+            print(f"Chatbot - API Key present: {bool(api_key)}, Length: {len(api_key) if api_key else 0}")
             if api_key:
                 genai.configure(api_key=api_key)
                 temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
@@ -194,9 +194,7 @@ def chatbot_response():
 def classify_complaint():
     try:
         # Check if API key is available
-        api_key = os.environ.get('GEMINI_API_KEY')
-        if not api_key:
-            return jsonify({"error": "API key not configured"}), 500
+        api_key = 'AIzaSyDjTRv3jSaaNy1FHJhcTxs4v_lliqKUAKQ'
             
         data = request.get_json()
         complaint_text = data.get('complaint_text', '')
