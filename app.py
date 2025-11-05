@@ -150,11 +150,17 @@ def chatbot_response():
         
         # Build conversation context
         context = ""
-        if conversation_history:
+        if conversation_history and len(conversation_history) > 0:
             context = "Previous conversation:\n"
-            for msg in conversation_history[-4:]:  # Last 4 messages for context
-                context += f"{msg['type']}: {msg['text']}\n"
-            context += "\n"
+            try:
+                for msg in conversation_history[-4:]:  # Last 4 messages for context
+                    if isinstance(msg, dict) and 'type' in msg and 'text' in msg:
+                        context += f"{msg['type']}: {msg['text']}\n"
+                    elif isinstance(msg, str):
+                        context += f"{msg}\n"
+                context += "\n"
+            except:
+                context = ""  # Skip context if format is wrong
         
         chatbot_prompt = f"""
         You are a college support assistant. Consider the conversation history and provide contextual responses.
