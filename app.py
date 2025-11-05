@@ -97,6 +97,11 @@ def student_login():
                 }
             })
         else:
+            # Check if students exist in database
+            c.execute('SELECT COUNT(*) FROM students')
+            count = c.fetchone()[0]
+            if count == 0:
+                return jsonify({"success": False, "message": "Database not initialized. Please try again."}), 500
             return jsonify({"success": False, "message": "Invalid credentials"}), 401
             
     except Exception as e:
