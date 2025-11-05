@@ -146,6 +146,7 @@ def chatbot_response():
         # Try to use Gemini API
         try:
             api_key = os.environ.get('GEMINI_API_KEY')
+            print(f"API Key length: {len(api_key) if api_key else 0}")
             if api_key:
                 genai.configure(api_key=api_key)
                 temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
