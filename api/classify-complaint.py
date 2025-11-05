@@ -7,10 +7,10 @@ from db import get_db_connection, init_db
 app = Flask(__name__)
 CORS(app)
 
-def handler(request):
+def handler(req):
     init_db()
     
-    if request.method != 'POST':
+    if req.method != 'POST':
         return jsonify({"error": "Method not allowed"}), 405
     
     try:
@@ -22,7 +22,7 @@ def handler(request):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('models/gemini-2.5-flash')
         
-        data = request.get_json()
+        data = req.get_json()
         complaint_text = data.get('complaint_text', '')
         student_id = data.get('student_id', '')
         student_name = data.get('student_name', 'Anonymous')
@@ -88,3 +88,6 @@ def handler(request):
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Export for Vercel
+default = handler

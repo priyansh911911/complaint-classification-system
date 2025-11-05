@@ -6,8 +6,8 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-def handler(request):
-    if request.method != 'POST':
+def handler(req):
+    if req.method != 'POST':
         return jsonify({"error": "Method not allowed"}), 405
     
     try:
@@ -19,7 +19,7 @@ def handler(request):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('models/gemini-2.5-flash')
         
-        data = request.get_json()
+        data = req.get_json()
         user_message = data.get('message', '')
         
         if not user_message:
@@ -49,3 +49,6 @@ def handler(request):
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Export for Vercel
+default = handler

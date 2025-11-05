@@ -4,12 +4,12 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-def handler(request):
-    if request.method != 'POST':
+def handler(req):
+    if req.method != 'POST':
         return jsonify({"error": "Method not allowed"}), 405
     
     try:
-        data = request.get_json()
+        data = req.get_json()
         username = data.get('username', '')
         password = data.get('password', '')
         
@@ -20,3 +20,6 @@ def handler(request):
             
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Export for Vercel
+default = handler

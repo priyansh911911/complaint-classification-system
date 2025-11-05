@@ -6,10 +6,10 @@ from db import get_db_connection, init_db
 app = Flask(__name__)
 CORS(app)
 
-def handler(request):
+def handler(req):
     init_db()
     
-    if request.method == 'GET':
+    if req.method == 'GET':
         # Get all complaints for admin
         try:
             conn = get_db_connection()
@@ -36,11 +36,11 @@ def handler(request):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
     
-    elif request.method == 'PUT':
+    elif req.method == 'PUT':
         # Resolve complaint
         try:
             # Extract complaint ID from URL path
-            path_parts = request.path.split('/')
+            path_parts = req.path.split('/')
             complaint_id = None
             for i, part in enumerate(path_parts):
                 if part == 'complaints' and i + 1 < len(path_parts):
@@ -63,3 +63,6 @@ def handler(request):
     
     else:
         return jsonify({"error": "Method not allowed"}), 405
+
+# Export for Vercel
+default = handler

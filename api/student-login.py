@@ -5,14 +5,14 @@ from db import get_db_connection, init_db
 app = Flask(__name__)
 CORS(app)
 
-def handler(request):
+def handler(req):
     init_db()
     
-    if request.method != 'POST':
+    if req.method != 'POST':
         return jsonify({"error": "Method not allowed"}), 405
     
     try:
-        data = request.get_json()
+        data = req.get_json()
         student_id = data.get('student_id', '')
         password = data.get('password', '')
         
@@ -36,3 +36,6 @@ def handler(request):
             
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Export for Vercel
+default = handler
