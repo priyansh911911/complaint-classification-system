@@ -139,6 +139,7 @@ def chatbot_response():
     try:
         data = request.get_json()
         user_message = data.get('message', '')
+        conversation_history = data.get('conversation_history', [])
         
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
@@ -147,17 +148,29 @@ def chatbot_response():
         genai.configure(api_key=api_key)
         temp_model = genai.GenerativeModel('models/gemini-2.5-flash')
         
+        # Build conversation context
+        context = ""
+        if conversation_history:
+            context = "Previous conversation:\n"
+            for msg in conversation_history[-4:]:  # Last 4 messages for context
+                context += f"{msg['type']}: {msg['text']}\n"
+            context += "\n"
+        
         chatbot_prompt = f"""
-        You are a college support assistant. Give ONE focused solution approach.
+        You are a college support assistant. Consider the conversation history and provide contextual responses.
         
-        Student message: "{user_message}"
+        {context}Current student message: "{user_message}"
         
-        Respond with:
-        1. Brief problem acknowledgment (1 sentence)
-        2. ONE specific solution with 2-3 clear steps
-        3. Ask if it worked or if they need alternative steps
+        If this is a follow-up (like "yes", "no", "it worked", "didn't work"):
+        - Acknowledge their response
+        - Provide next appropriate step or alternative solution
         
-        Keep response under 50 words. Be direct and actionable.
+        If this is a new issue:
+        - Brief problem acknowledgment (1 sentence)
+        - ONE specific solution with 2-3 clear steps
+        - Ask if it worked
+        
+        Keep response under 50 words. Be direct and contextual.
         """
         
         response = temp_model.generate_content(chatbot_prompt)
