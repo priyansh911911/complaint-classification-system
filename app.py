@@ -7,7 +7,7 @@ from datetime import datetime
 import json
 
 app = Flask(__name__)
-CORS(app, origins=["*"])
+CORS(app, origins=["*"], methods=["GET", "POST", "PUT", "OPTIONS"], allow_headers=["Content-Type"])
 
 # Initialize database
 def init_db():
