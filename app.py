@@ -171,6 +171,7 @@ def chatbot_response():
         except Exception as e:
             # Log the actual error
             print(f"Gemini API Error: {str(e)}")
+            print(f"Error type: {type(e).__name__}")
             # Fallback responses
             user_lower = user_message.lower()
             if 'wifi' in user_lower or 'internet' in user_lower:
