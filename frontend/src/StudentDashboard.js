@@ -8,10 +8,6 @@ const StudentDashboard = ({ student, onLogout }) => {
   const [activeTab, setActiveTab] = useState('chat');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchComplaints();
-  }, [fetchComplaints]);
-
   const fetchComplaints = useCallback(async () => {
     try {
       const response = await fetch(`${config.API_BASE_URL}/student-complaints/${student.id}`);
@@ -23,6 +19,10 @@ const StudentDashboard = ({ student, onLogout }) => {
       setLoading(false);
     }
   }, [student.id]);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, [fetchComplaints]);
 
   const handleSubmitComplaint = (studentName, chatHistory) => {
     setActiveTab('complaint');
