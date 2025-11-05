@@ -7,7 +7,7 @@ from datetime import datetime
 import json
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])
+CORS(app, origins=["http://localhost:3000", "https://complaint-classifier-ba92vl567-rks-projects-f1e9b40d.vercel.app", "https://complaint-classifier.vercel.app", "https://*.onrender.com"])
 
 # Initialize database
 def init_db():
@@ -306,8 +306,9 @@ def resolve_complaint(complaint_id):
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    print("\n🚀 Complaint Classification System Started!")
-    print("📊 Student Portal: http://localhost:3000")
-    print("🔧 Admin Dashboard: http://localhost:3000/admin")
-    print("💾 Database: complaints.db")
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    print("\nComplaint Classification System Started!")
+    print("Student Portal: http://localhost:3000")
+    print("Admin Dashboard: http://localhost:3000/admin")
+    print("Database: complaints.db")
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
