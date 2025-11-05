@@ -168,7 +168,9 @@ def chatbot_response():
                 bot_reply = response.text.strip()
             else:
                 raise Exception("No API key")
-        except Exception:
+        except Exception as e:
+            # Log the actual error
+            print(f"Gemini API Error: {str(e)}")
             # Fallback responses
             user_lower = user_message.lower()
             if 'wifi' in user_lower or 'internet' in user_lower:
