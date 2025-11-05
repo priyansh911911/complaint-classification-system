@@ -7,7 +7,7 @@ from datetime import datetime
 import json
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000", "https://complaint-classifier-ba92vl567-rks-projects-f1e9b40d.vercel.app", "https://complaint-classifier.vercel.app", "https://*.onrender.com"])
+CORS(app, origins=["*"])
 
 # Initialize database
 def init_db():
@@ -74,6 +74,7 @@ model = genai.GenerativeModel('models/gemini-2.5-flash')
 print("Using: models/gemini-2.5-flash")
 
 @app.route('/student/login', methods=['POST'])
+@app.route('/student-login', methods=['POST'])
 def student_login():
     try:
         data = request.get_json()
@@ -102,6 +103,7 @@ def student_login():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/student/complaints/<student_id>', methods=['GET'])
+@app.route('/student-complaints/<student_id>', methods=['GET'])
 def get_student_complaints(student_id):
     try:
         conn = sqlite3.connect('complaints.db')
@@ -253,6 +255,7 @@ def classify_complaint():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/admin/login', methods=['POST'])
+@app.route('/admin-login', methods=['POST'])
 def admin_login():
     data = request.get_json()
     username = data.get('username', '')
@@ -265,6 +268,7 @@ def admin_login():
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
 @app.route('/admin/complaints', methods=['GET'])
+@app.route('/complaints', methods=['GET'])
 def get_all_complaints():
     try:
         conn = sqlite3.connect('complaints.db')
@@ -292,6 +296,7 @@ def get_all_complaints():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/admin/complaints/<int:complaint_id>/resolve', methods=['PUT'])
+@app.route('/complaints/<int:complaint_id>/resolve', methods=['PUT'])
 def resolve_complaint(complaint_id):
     try:
         conn = sqlite3.connect('complaints.db')
